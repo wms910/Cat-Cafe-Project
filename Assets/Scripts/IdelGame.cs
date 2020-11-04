@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,9 +47,11 @@ public class IdelGame : MonoBehaviour
     //value
     public void Start()
     {
+        Application.targetFrameRate = 60;
         Load();
     }
 
+    //Load the data
     public void Load()
     {
         coins = double.Parse(PlayerPrefs.GetString("coins", "0"));
@@ -63,6 +66,7 @@ public class IdelGame : MonoBehaviour
         productionUpgrade2Level = PlayerPrefs.GetInt("productionUpgrade2Level", 0);
     }
 
+    //Save the data
     public void Save()
     {
         PlayerPrefs.SetString("coins", coins.ToString());
@@ -77,6 +81,7 @@ public class IdelGame : MonoBehaviour
         PlayerPrefs.SetInt("productionUpgrade2Level", productionUpgrade2Level);
     }
 
+    //Update every frame
     public void Update()
     {
         //gems
@@ -89,141 +94,52 @@ public class IdelGame : MonoBehaviour
 
         coinsPerSecond = (productionUpgrade1Level + (productionUpgrade2Power * productionUpgrade2Level)) * gemboost;
 
-        //coinsClickValue
-        if (coinsClickValue > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(coinsClickValue))));
-            var mantissa = (coinsClickValue / System.Math.Pow(10, exponent));
-            clickValueText.text = "Click\n+" + mantissa.ToString("F2") + "e" + exponent + "Coins";
-        }
-        else
-        {
-            clickValueText.text = "Click\n+" + coinsClickValue.ToString("F0") + "Coins";
-        }
+        //coinsClickValue text
+        clickValueText.text = "Click\n+" + NotationMethod(coinsClickValue,y:"F0") + "Coins";
 
-        //coins
-        if (coins > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(coins))));
-            var mantissa = (coins / System.Math.Pow(10, exponent));
-            coinsText.text = "Coins: " + mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            coinsText.text = "Coins: " + coins.ToString("F0");
-        }
+        //coins text
+        clickValueText.text = "Coins: " + NotationMethod(coins, y: "F0");
 
+        //coins per second text
         coinsPerSecText.text = coinsPerSecond.ToString("F0") + " coins/s";
 
         //clickUpgrade1CostString
         string clickUpgrade1CostString;
         var clickUpgrade1Cost = 10 * System.Math.Pow(1.07, clickUpgrade1Level);
-        if (clickUpgrade1Cost > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(clickUpgrade1Cost))));
-            var mantissa = (clickUpgrade1Cost / System.Math.Pow(10, exponent));
-            clickUpgrade1CostString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            clickUpgrade1CostString = clickUpgrade1Cost.ToString("F0");
-        }
+        clickUpgrade1CostString = NotationMethod(clickUpgrade1Cost, y: "F0");
 
         //clickUpgrade1LevelString
         string clickUpgrade1LevelString;
-        if (clickUpgrade1Level > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(clickUpgrade1Level))));
-            var mantissa = (clickUpgrade1Level / System.Math.Pow(10, exponent));
-            clickUpgrade1LevelString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            clickUpgrade1LevelString = clickUpgrade1Level.ToString("F0");
-        }
+        clickUpgrade1LevelString = NotationMethod(clickUpgrade1Level, y: "F0");
 
         //clickUpgrade2CostString
         string clickUpgrade2CostString;
         var clickUpgrade2Cost = 100 * System.Math.Pow(1.09, clickUpgrade2Level);
-        if (clickUpgrade2Cost > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(clickUpgrade2Cost))));
-            var mantissa = (clickUpgrade2Cost / System.Math.Pow(10, exponent));
-            clickUpgrade2CostString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            clickUpgrade2CostString = clickUpgrade2Cost.ToString("F0");
-        }
+        clickUpgrade2CostString = NotationMethod(clickUpgrade2Cost, y: "F0");
 
         //clickUpgrade2LevelString
         string clickUpgrade2LevelString;
-        if (clickUpgrade2Level > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(clickUpgrade2Level))));
-            var mantissa = (clickUpgrade2Level / System.Math.Pow(10, exponent));
-            clickUpgrade2LevelString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            clickUpgrade2LevelString = clickUpgrade2Level.ToString("F0");
-        }
-
+        clickUpgrade2LevelString = NotationMethod(clickUpgrade2Level, y: "F0");
 
         //productionUpgrade1CostString
         string productionUpgrade1CostString;
         var productionUpgrade1Cost = 25 * System.Math.Pow(1.07, productionUpgrade1Level);
-        if (productionUpgrade1Cost > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade1Cost))));
-            var mantissa = (productionUpgrade1Cost / System.Math.Pow(10, exponent));
-            productionUpgrade1CostString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            productionUpgrade1CostString = productionUpgrade1Cost.ToString("F0");
-        }
+        productionUpgrade1CostString = NotationMethod(productionUpgrade1Cost, y: "F0");
 
         //productionUpgrade1LevelString
         string productionUpgrade1LevelString;
-        if (productionUpgrade1Level > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade1Level))));
-            var mantissa = (productionUpgrade1Level / System.Math.Pow(10, exponent));
-            productionUpgrade1LevelString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            productionUpgrade1LevelString = productionUpgrade1Level.ToString("F0");
-        }
+        productionUpgrade1LevelString = NotationMethod(productionUpgrade1Level, y: "F0");
 
         //productionUpgrade2CostString
         string productionUpgrade2CostString;
         var productionUpgrade2Cost = 250 * System.Math.Pow(1.07, productionUpgrade2Level);
-        if (productionUpgrade2Cost > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade2Cost))));
-            var mantissa = (productionUpgrade2Cost / System.Math.Pow(10, exponent));
-            productionUpgrade2CostString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            productionUpgrade2CostString = productionUpgrade2Cost.ToString("F0");
-        }
+        productionUpgrade2CostString = NotationMethod(productionUpgrade2Cost, y: "F0");
 
         //productionUpgrade2LevelString
         string productionUpgrade2LevelString;
-        if (productionUpgrade2Level > 1000)
-        {
-            var exponent = (System.Math.Floor(System.Math.Log10(System.Math.Abs(productionUpgrade2Level))));
-            var mantissa = (productionUpgrade2Level / System.Math.Pow(10, exponent));
-            productionUpgrade2LevelString = mantissa.ToString("F2") + "e" + exponent;
-        }
-        else
-        {
-            productionUpgrade2LevelString = productionUpgrade2Level.ToString("F0");
-        }
+        productionUpgrade2LevelString = NotationMethod(productionUpgrade2Level, y: "F0");
 
+        //show text and calculation
         clickUpgrade1Text.text = "Click Upgrade 1\nCost: " + clickUpgrade1CostString + "coins\nPower: +1 Click\nLevel: " + clickUpgrade1LevelString;
        
         clickUpgrade2Text.text = "Click Upgrade 2\nCost: " + clickUpgrade2CostString + "coins\nPower: +5 Click\nLevel: " + clickUpgrade2LevelString;
@@ -298,6 +214,33 @@ public class IdelGame : MonoBehaviour
         Save();
     }
 
+    public string NotationMethod(double x, string y)
+    {
+        if (x > 1000)
+        {
+            var exponent = Math.Floor(Math.Log10(Math.Abs(x)));
+            var mantissa = x / Math.Pow(10, exponent);
+            return mantissa.ToString(format: "F2") + "e" + exponent;
+        }
+        else
+        {
+            return x.ToString(y);
+        }
+    }
+
+    public string NotationMethod(float x, string y)
+    {
+        if (x > 1000)
+        {
+            var exponent = Mathf.Floor(Mathf.Log10(Mathf.Abs(x)));
+            var mantissa = x / Mathf.Pow(10, exponent);
+            return mantissa.ToString(format: "F2") + "e" + exponent;
+        }
+        else
+        {
+            return x.ToString(y);
+        }
+    }
 
     //prestige
     public void Prestige()
@@ -417,6 +360,10 @@ public class IdelGame : MonoBehaviour
         var cu2n = System.Math.Floor(System.Math.Log(cu2c * (cu2r - 1) / (cu2b * System.Math.Pow(cu2r, cu2k)) + 1, cu2r));
         return cu2n;
     }
+
+
+
+
 
     //ProductionUpgrade1
     public void BuyProductionUpgrade1()
