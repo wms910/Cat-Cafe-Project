@@ -81,6 +81,12 @@ public class IdelGame : MonoBehaviour
 
     public GameObject settings;
 
+    public void Awake()
+    {
+        Screen.SetResolution(1080, 1920, true);
+        Screen.fullScreen = false;
+    }
+
     //value
     public void Start()
     {
