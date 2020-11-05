@@ -43,12 +43,37 @@ public class IdelGame : MonoBehaviour
     public Text productionUpgrade1MaxText;
     public Text productionUpgrade2MaxText;
 
+    public CanvasGroup mainMenuGroup;
+    public CanvasGroup upgradesGroup;
 
     //value
     public void Start()
     {
         Application.targetFrameRate = 60;
+
+        CanvasGroupChanger(true, mainMenuGroup);
+        CanvasGroupChanger(false, upgradesGroup);
+
         Load();
+    }
+
+    //Turn on and off the CanvasGroup
+    public void CanvasGroupChanger(bool x, CanvasGroup y)
+    {
+        if (x)
+        {
+            y.alpha = 1;
+            y.interactable = true;
+            y.blocksRaycasts = true;
+            return;
+        }
+
+        else
+        {
+            y.alpha = 0;
+            y.interactable = false;
+            y.blocksRaycasts = false;
+        }
     }
 
     //Load the data
@@ -445,4 +470,20 @@ public class IdelGame : MonoBehaviour
         var pu2n = System.Math.Floor(System.Math.Log(pu2c * (pu2r - 1) / (pu2b * System.Math.Pow(pu2r, pu2k)) + 1, pu2r));
         return pu2n;
     }
+
+    public void ChangeTabs(string id)
+    {
+        switch (id)
+        {
+            case "upgrades":
+                CanvasGroupChanger(false, mainMenuGroup);
+                CanvasGroupChanger(true, upgradesGroup);
+                break;
+            case "main":
+                CanvasGroupChanger(true, mainMenuGroup);
+                CanvasGroupChanger(false, upgradesGroup);
+                break;
+        }
+    }
+
 }
