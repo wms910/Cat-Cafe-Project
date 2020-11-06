@@ -78,6 +78,7 @@ public class IdelGame : MonoBehaviour
     public CanvasGroup mainMenuGroup;
     public CanvasGroup upgradesGroup;
     public CanvasGroup settingScreen;
+    public CanvasGroup startScreen;
 
     public GameObject settings;
 
@@ -93,11 +94,11 @@ public class IdelGame : MonoBehaviour
         //set FPS to 60
         Application.targetFrameRate = 60;
 
-        //turn on main screen and turn off the upgrade screen
-        CanvasGroupChanger(true, mainMenuGroup);
+        CanvasGroupChanger(true, startScreen);
+        CanvasGroupChanger(false, mainMenuGroup);
         CanvasGroupChanger(false, upgradesGroup);
         CanvasGroupChanger(false, settingScreen);
-        CanvasGroupChanger(true, header);
+        CanvasGroupChanger(false, header);
 
         //Load the data
         SaveSystem.LoadPlayer(ref data);
@@ -498,24 +499,28 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, upgradesGroup);
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
+                CanvasGroupChanger(false, startScreen);
                 break;
             case "main":
                 CanvasGroupChanger(true, mainMenuGroup);
                 CanvasGroupChanger(false, upgradesGroup);
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
+                CanvasGroupChanger(false, startScreen);
                 break;
             case "Settings":
                 CanvasGroupChanger(false, mainMenuGroup);
                 CanvasGroupChanger(false, upgradesGroup);
                 CanvasGroupChanger(true, settingScreen);
                 CanvasGroupChanger(false, header);
+                CanvasGroupChanger(false, startScreen);
                 break;
             case "BackFromSetting":
                 CanvasGroupChanger(true, mainMenuGroup);
                 CanvasGroupChanger(false, upgradesGroup);
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
+                CanvasGroupChanger(false, startScreen);
                 break;
         }
     }
@@ -533,5 +538,11 @@ public class IdelGame : MonoBehaviour
     public void FullReset()
     {
         data.FullReset();
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+        Debug.Log("Exit Game");
     }
 }
