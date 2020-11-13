@@ -82,6 +82,9 @@ public class IdelGame : MonoBehaviour
 
     public GameObject settings;
 
+    public Image backgroundimage;
+    public Image settingimage;
+
     public void Awake()
     {
         Screen.SetResolution(1080, 1920, true);
@@ -500,6 +503,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
+                backgroundimage.enabled = true;
+                settingimage.enabled = false;
                 break;
             case "main":
                 CanvasGroupChanger(true, mainMenuGroup);
@@ -507,6 +512,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
+                backgroundimage.enabled = true;
+                settingimage.enabled = false;
                 break;
             case "Settings":
                 CanvasGroupChanger(false, mainMenuGroup);
@@ -514,6 +521,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, settingScreen);
                 CanvasGroupChanger(false, header);
                 CanvasGroupChanger(false, startScreen);
+                backgroundimage.enabled = false;
+                settingimage.enabled = true;
                 break;
             case "BackFromSetting":
                 CanvasGroupChanger(true, mainMenuGroup);
@@ -521,6 +530,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
+                backgroundimage.enabled = true;
+                settingimage.enabled = false;
                 break;
         }
     }
