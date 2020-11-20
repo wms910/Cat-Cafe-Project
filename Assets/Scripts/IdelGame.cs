@@ -24,6 +24,9 @@ public class PlayerData
     public BigDouble gemboost;
     public BigDouble gemsToGet;
 
+    public BigDouble cats;
+    public BigDouble catBeds;
+
     public PlayerData()
     {
         FullReset();
@@ -42,6 +45,8 @@ public class PlayerData
         gems = 0;
         gemboost = 1;
         gemsToGet = 0;
+        cats = 0;
+        catBeds = 0;
     }
 }
 
@@ -74,11 +79,15 @@ public class IdelGame : MonoBehaviour
     public Text productionUpgrade1MaxText;
     public Text productionUpgrade2MaxText;
 
+    public Text catNumberText;
+    public Text catBedNumberText;
+
     public CanvasGroup header;
     public CanvasGroup mainMenuGroup;
     public CanvasGroup upgradesGroup;
     public CanvasGroup settingScreen;
     public CanvasGroup startScreen;
+    public CanvasGroup inventoryScreen;
 
     public GameObject settings;
 
@@ -102,6 +111,7 @@ public class IdelGame : MonoBehaviour
         CanvasGroupChanger(false, upgradesGroup);
         CanvasGroupChanger(false, settingScreen);
         CanvasGroupChanger(false, header);
+        CanvasGroupChanger(false, inventoryScreen);
 
         //Load the data
         SaveSystem.LoadPlayer(ref data);
@@ -138,6 +148,8 @@ public class IdelGame : MonoBehaviour
         gemBoostText.text = data.gemboost.ToString("F2") + "x boost";
 
         data.coinsPerSecond = (data.productionUpgrade1Level + (data.productionUpgrade2Power * data.productionUpgrade2Level)) * data.gemboost;
+        //coinsPerSecond influenced by the number of cats in their beds
+        data.coinsPerSecond += (data.catBeds * 5);
 
         //coinsClickValue text
         clickValueText.text = "Click\n+" + NotationMethod(data.coinsClickValue,y:"F0") + "Coins";
@@ -147,6 +159,12 @@ public class IdelGame : MonoBehaviour
 
         //coins per second text
         coinsPerSecText.text = data.coinsPerSecond.ToString("F0") + " coins/s";
+
+        //cat number text
+        catNumberText.text = "Cats In This Cafe: " + data.cats;
+
+        //cat bed number text
+        catBedNumberText.text = "Beds For Your Cats: " + data.catBeds;
 
         //clickUpgrade1CostString
         string clickUpgrade1CostString;
@@ -314,6 +332,31 @@ public class IdelGame : MonoBehaviour
         data.coins += data.coinsClickValue;
     }
 
+    public void BuyCatUpgrade1()
+    {
+        var cu1cost = 50;
+        if (data.coins >= cu1cost)
+        {
+            data.coins -= cu1cost;
+            data.cats++;
+
+            //Temporary solution for buying cats. Will change later after design discussion
+            data.coinsClickValue++;
+        }
+    }
+
+    public void BuyCatBedUpgrade1()
+    {
+        var cbu1cost = 100;
+        if (data.coins >= cbu1cost && data.catBeds < data.cats) //Only lets you buy beds if you have cats
+        {
+            data.coins -= cbu1cost;
+            data.catBeds++;
+
+            //Cat bed multiplier is already called under Update(). This method just increments catBeds
+        }
+    }
+
     //ClickUpgrade1
     public void BuyClickUpgrade1()
     {
@@ -322,7 +365,7 @@ public class IdelGame : MonoBehaviour
         {
             data.clickUpgrade1Level++;
             data.coins -= cu1cost;
-        cu1cost *= 1.07;
+            cu1cost *= 1.07;
             data.coinsClickValue++;
         }
         else
@@ -503,6 +546,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
+                CanvasGroupChanger(false, inventoryScreen);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -512,6 +556,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
+                CanvasGroupChanger(false, inventoryScreen);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -521,6 +566,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, settingScreen);
                 CanvasGroupChanger(false, header);
                 CanvasGroupChanger(false, startScreen);
+                CanvasGroupChanger(false, inventoryScreen);
                 backgroundimage.enabled = false;
                 settingimage.enabled = true;
                 break;
@@ -530,6 +576,17 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, settingScreen);
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
+                CanvasGroupChanger(false, inventoryScreen);
+                backgroundimage.enabled = true;
+                settingimage.enabled = false;
+                break;
+            case "inventory":
+                CanvasGroupChanger(false, mainMenuGroup);
+                CanvasGroupChanger(false, upgradesGroup);
+                CanvasGroupChanger(false, settingScreen);
+                CanvasGroupChanger(true, header);
+                CanvasGroupChanger(false, startScreen);
+                CanvasGroupChanger(true, inventoryScreen);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
