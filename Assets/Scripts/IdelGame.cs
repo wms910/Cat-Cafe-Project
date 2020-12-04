@@ -88,8 +88,11 @@ public class IdelGame : MonoBehaviour
     public CanvasGroup settingScreen;
     public CanvasGroup startScreen;
     public CanvasGroup inventoryScreen;
+    public CanvasGroup catGroup;
 
     public GameObject settings;
+    public GameObject catPrefab;
+    public List<GameObject> catList;
 
     public Image backgroundimage;
     public Image settingimage;
@@ -112,9 +115,41 @@ public class IdelGame : MonoBehaviour
         CanvasGroupChanger(false, settingScreen);
         CanvasGroupChanger(false, header);
         CanvasGroupChanger(false, inventoryScreen);
+        CanvasGroupChanger(false, catGroup);
 
         //Load the data
         SaveSystem.LoadPlayer(ref data);
+
+        //Create the array of cats and add to it if previous data was saved
+        catList = new List<GameObject>();
+        if (data.cats < 20 && data.cats != 0)
+        {
+            for (int i = 0; i < data.cats; i++)
+            {
+                float spawnPositionX = UnityEngine.Random.Range(550f, 750f);
+                float spawnPositionY = UnityEngine.Random.Range(35f, 290f);
+
+                GameObject kitty = Instantiate(catPrefab, new Vector2(spawnPositionX, spawnPositionY), Quaternion.identity);
+                kitty.transform.SetParent(GameObject.FindGameObjectWithTag("CatGroup").transform);
+                kitty.transform.localScale = new Vector3(2, 2, 2);
+
+                catList.Add(kitty);
+            }
+        }
+        else if (data.cats >= 20)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                float spawnPositionX = UnityEngine.Random.Range(550f, 750f);
+                float spawnPositionY = UnityEngine.Random.Range(35f, 290f);
+
+                GameObject kitty = Instantiate(catPrefab, new Vector2(spawnPositionX, spawnPositionY), Quaternion.identity);
+                kitty.transform.SetParent(GameObject.FindGameObjectWithTag("CatGroup").transform);
+                kitty.transform.localScale = new Vector3(2, 2, 2);
+
+                catList.Add(kitty);
+            }
+        }
     }
 
     //Turn on and off the CanvasGroup
@@ -340,6 +375,21 @@ public class IdelGame : MonoBehaviour
             data.coins -= cu1cost;
             data.cats++;
 
+            //Cap the amount of spawned cats to 20
+            if (catList.Count < 20)
+            {
+                //Create a random Y position for the cat to spawn at
+                float spawnPositionY = UnityEngine.Random.Range(35f, 290f);
+
+                //Spawn the object, assign its parent to the canvas group, and reset its scale
+                GameObject kitty = Instantiate(catPrefab, new Vector2(600, spawnPositionY), Quaternion.identity);
+                kitty.transform.SetParent(GameObject.FindGameObjectWithTag("CatGroup").transform);
+                kitty.transform.localScale = new Vector3(2, 2, 2);
+
+                //Add the kitty to the list of cats
+                catList.Add(kitty);
+            }
+
             //Temporary solution for buying cats. Will change later after design discussion
             data.coinsClickValue++;
         }
@@ -547,6 +597,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -557,6 +608,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -567,6 +619,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = false;
                 settingimage.enabled = true;
                 break;
@@ -577,6 +630,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -587,6 +641,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(true, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -606,6 +661,13 @@ public class IdelGame : MonoBehaviour
     public void FullReset()
     {
         data.FullReset();
+
+        //Clear the list of cats
+        for (int i = 0; i < catList.Count; i++)
+        {
+            Destroy(catList[i].gameObject);
+        }
+        catList.Clear();
     }
 
     public void ExitGame()
