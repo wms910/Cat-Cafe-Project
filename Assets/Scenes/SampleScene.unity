@@ -8105,7 +8105,7 @@ GameObject:
   - component: {fileID: 1940100057}
   - component: {fileID: 1940100056}
   m_Layer: 5
-  m_Name: Settings
+  m_Name: ResetButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8172,8 +8172,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1034630850}
-        m_MethodName: ChangeTabs
-        m_Mode: 5
+        m_MethodName: FullReset
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
