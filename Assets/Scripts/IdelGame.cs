@@ -11,6 +11,7 @@ using static BreakInfinity.BigDouble;
 public class PlayerData
 {
     public BigDouble coins;
+    public BigDouble coinsCollected;
     public BigDouble coinsClickValue;
     public BigDouble coinsPerSecond;
 
@@ -24,8 +25,13 @@ public class PlayerData
     public BigDouble gemboost;
     public BigDouble gemsToGet;
 
+
     public BigDouble cats;
     public BigDouble catBeds;
+
+    public BigDouble achlevel1;
+    public BigDouble achlevel2;
+
 
     public PlayerData()
     {
@@ -35,18 +41,22 @@ public class PlayerData
     public void FullReset()
     {
         coins = 0;
+        coinsCollected = 0;
         coinsClickValue = 1;
         coinsPerSecond = 0;
         clickUpgrade1Level = 0;
         clickUpgrade2Level = 0;
         productionUpgrade1Level = 0;
         productionUpgrade2Level = 0;
-        productionUpgrade2Power = 5;
+        productionUpgrade2Power = 0;
         gems = 0;
         gemboost = 1;
         gemsToGet = 0;
+
         cats = 0;
         catBeds = 0;
+        achlevel1 = 0;
+        achlevel2 = 0;
     }
 }
 
@@ -85,6 +95,7 @@ public class IdelGame : MonoBehaviour
     public CanvasGroup header;
     public CanvasGroup mainMenuGroup;
     public CanvasGroup upgradesGroup;
+    public CanvasGroup achievementsGroup;
     public CanvasGroup settingScreen;
     public CanvasGroup startScreen;
     public CanvasGroup inventoryScreen;
@@ -97,11 +108,17 @@ public class IdelGame : MonoBehaviour
     public Image backgroundimage;
     public Image settingimage;
 
+    public BigDouble achlevel1;
+    public BigDouble achlevel2;
+
     public void Awake()
     {
         Screen.SetResolution(1080, 1920, true);
         Screen.fullScreen = false;
     }
+
+    public GameObject achievementScreen;
+    public List<Achievements> achievementList = new List<Achievements>();
 
     //value
     public void Start()
@@ -109,13 +126,19 @@ public class IdelGame : MonoBehaviour
         //set FPS to 60
         Application.targetFrameRate = 60;
 
+        foreach (var x in achievementScreen.GetComponentsInChildren<Achievements>())
+            achievementList.Add(x);
+
         CanvasGroupChanger(true, startScreen);
         CanvasGroupChanger(false, mainMenuGroup);
         CanvasGroupChanger(false, upgradesGroup);
         CanvasGroupChanger(false, settingScreen);
         CanvasGroupChanger(false, header);
+
         CanvasGroupChanger(false, inventoryScreen);
         CanvasGroupChanger(false, catGroup);
+        CanvasGroupChanger(false, achievementsGroup);
+
 
         //Load the data
         SaveSystem.LoadPlayer(ref data);
@@ -174,9 +197,12 @@ public class IdelGame : MonoBehaviour
     //Update every frame
     public void Update()
     {
+        //Achievements
+        RunAchievements();
+
         //gems
         data.gemsToGet = (150 * Sqrt(data.coins / 1e7));
-        data.gemboost = (data.gems * 0.05) +1;
+        data.gemboost = (data.gems * 0.05) + 1;
 
         gemsToGetText.text = "Prestige:\n+" + Floor(data.gemsToGet).ToString("F0") + " Gems";
         gemsText.text = "Gems: " + Floor(data.gems).ToString("F0");
@@ -187,7 +213,7 @@ public class IdelGame : MonoBehaviour
         data.coinsPerSecond += (data.catBeds * 5);
 
         //coinsClickValue text
-        clickValueText.text = "Click\n+" + NotationMethod(data.coinsClickValue,y:"F0") + "Coins";
+        clickValueText.text = "Click\n+" + NotationMethod(data.coinsClickValue, y: "F0") + "Coins";
 
         //coins text
         coinsText.text = "Coins: " + NotationMethod(data.coins, y: "F0");
@@ -212,7 +238,7 @@ public class IdelGame : MonoBehaviour
 
         //clickUpgrade2CostString
         string clickUpgrade2CostString;
-        var clickUpgrade2Cost = 100 * Pow(1.09, data.clickUpgrade2Level);
+        var clickUpgrade2Cost = 100 * Pow(1.07, data.clickUpgrade2Level);
         clickUpgrade2CostString = NotationMethod(clickUpgrade2Cost, y: "F0");
 
         //clickUpgrade2LevelString
@@ -239,11 +265,11 @@ public class IdelGame : MonoBehaviour
 
         //show text and calculation
         clickUpgrade1Text.text = "Click Upgrade 1\nCost: " + clickUpgrade1CostString + "coins\nPower: +1 Click\nLevel: " + clickUpgrade1LevelString;
-       
+
         clickUpgrade2Text.text = "Click Upgrade 2\nCost: " + clickUpgrade2CostString + "coins\nPower: +5 Click\nLevel: " + clickUpgrade2LevelString;
 
         productionUpgrade1Text.text = "Production Upgrade 1\nCost: " + productionUpgrade1CostString + "coins\nPower: +" + data.gemboost.ToString("F2") + " coins/s\nLevel: " + productionUpgrade1LevelString;
-        productionUpgrade2Text.text = "Production Upgrade 2\nCost: " + productionUpgrade2CostString+ "coins\nPower: +" + (data.productionUpgrade2Power * data.gemboost).ToString("F2") + " coins /s\nLevel: " + productionUpgrade2LevelString;
+        productionUpgrade2Text.text = "Production Upgrade 2\nCost: " + productionUpgrade2CostString + "coins\nPower: +" + (data.productionUpgrade2Power * data.gemboost).ToString("F2") + " coins /s\nLevel: " + productionUpgrade2LevelString;
 
         data.coins += data.coinsPerSecond * Time.deltaTime;
 
@@ -252,13 +278,13 @@ public class IdelGame : MonoBehaviour
         {
             clickUpgrade1Bar.fillAmount = 0;
         }
-        else if(data.coins /clickUpgrade1Cost > 10)
+        else if (data.coins / clickUpgrade1Cost > 10)
         {
             clickUpgrade1Bar.fillAmount = 1;
         }
         else
         {
-        clickUpgrade1Bar.fillAmount = (float)(data.coins / clickUpgrade1Cost).ToDouble();
+            clickUpgrade1Bar.fillAmount = (float)(data.coins / clickUpgrade1Cost).ToDouble();
         }
 
         //clickupgrade2bar
@@ -311,6 +337,44 @@ public class IdelGame : MonoBehaviour
 
         SaveSystem.SavePlayer(data);
     }
+
+    private static string[] AchievementStrings => new string[] {"Current Coins", "Total Coins Collected"};
+    private BigDouble[] AchievementsNumber => new BigDouble[] { data.coins, data.coinsCollected };
+    private void RunAchievements()
+    {
+        UpdateAchievement(AchievementStrings[0],number: AchievementsNumber[0], ref data.achlevel1, ref achievementList[0].fill, ref achievementList[0].title, ref achievementList[0].progress);
+        UpdateAchievement(AchievementStrings[1], number: AchievementsNumber[1], ref data.achlevel2, ref achievementList[1].fill, ref achievementList[1].title, ref achievementList[1].progress);
+    }
+
+    private void UpdateAchievement(string name, BigDouble number,ref BigDouble level, ref Image fill, ref Text title, ref Text progress)
+    {
+        var cap = BigDouble.Pow(value: 10, power: level);
+
+        title.text = $"{name}\n({level})";
+        progress.text = $"{NotationMethod(number, y: "F2")}/{NotationMethod(cap, y: "F2")}";
+
+        BigDoubleFill(x: number, y: cap, fill);
+
+        if (number < cap) return;
+        BigDouble levels = 0;
+        if (One / cap >= 1)
+            levels = Floor(Log10(One / cap)) + 1;
+        level += levels;
+    }
+
+    private void BigDoubleFill(BigDouble x, BigDouble y, Image fill)
+    {
+        float z;
+        var a = x / y;
+        if (a < 0.001)
+            z = 0;
+        else if (a > 10)
+            z = 1;
+        else
+            z = (float)a.ToDouble();
+        fill.fillAmount = z;
+    }
+
 
     //Method of calculate and round in double
     public string NotationMethod(BigDouble x, string y)
@@ -365,6 +429,7 @@ public class IdelGame : MonoBehaviour
     public void Click()
     {
         data.coins += data.coinsClickValue;
+        data.coinsCollected += data.coinsClickValue;
     }
 
     public void BuyCatUpgrade1()
@@ -598,6 +663,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, inventoryScreen);
                 CanvasGroupChanger(true, catGroup);
+                CanvasGroupChanger(false, achievementsGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -609,6 +675,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, inventoryScreen);
                 CanvasGroupChanger(true, catGroup);
+                CanvasGroupChanger(false, achievementsGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -620,6 +687,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, inventoryScreen);
                 CanvasGroupChanger(true, catGroup);
+                CanvasGroupChanger(false, achievementsGroup);
                 backgroundimage.enabled = false;
                 settingimage.enabled = true;
                 break;
@@ -635,6 +703,12 @@ public class IdelGame : MonoBehaviour
                 settingimage.enabled = false;
                 break;
             case "inventory":
+                CanvasGroupChanger(false, achievementsGroup);
+                backgroundimage.enabled = true;
+                settingimage.enabled = false;
+                break;
+
+            case "Achievements":
                 CanvasGroupChanger(false, mainMenuGroup);
                 CanvasGroupChanger(false, upgradesGroup);
                 CanvasGroupChanger(false, settingScreen);
@@ -642,6 +716,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(true, inventoryScreen);
                 CanvasGroupChanger(true, catGroup);
+                CanvasGroupChanger(true, achievementsGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
