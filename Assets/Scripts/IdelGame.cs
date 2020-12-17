@@ -28,6 +28,9 @@ public class PlayerData
     public BigDouble achlevel1;
     public BigDouble achlevel2;
 
+    public BigDouble cats;
+    public BigDouble catBeds;
+
     public PlayerData()
     {
         FullReset();
@@ -49,6 +52,8 @@ public class PlayerData
         gemsToGet = 0;
         achlevel1 = 0;
         achlevel2 = 0;
+        cats = 0;
+        catBeds = 0;
     }
 }
 
@@ -66,6 +71,9 @@ public class IdelGame : MonoBehaviour
     public Text clickUpgrade2Text;
     public Text productionUpgrade1Text;
     public Text productionUpgrade2Text;
+
+    public Text catNumberText;
+    public Text catBedNumberText;
 
     public Text gemsText;
     public Text gemBoostText;
@@ -87,8 +95,12 @@ public class IdelGame : MonoBehaviour
     public CanvasGroup achievementsGroup;
     public CanvasGroup settingScreen;
     public CanvasGroup startScreen;
+    public CanvasGroup inventoryScreen;
+    public CanvasGroup catGroup;
 
     public GameObject settings;
+    public GameObject catPrefab;
+    public List<GameObject> catList;
 
     public Image backgroundimage;
     public Image settingimage;
@@ -120,9 +132,42 @@ public class IdelGame : MonoBehaviour
         CanvasGroupChanger(false, settingScreen);
         CanvasGroupChanger(false, header);
         CanvasGroupChanger(false, achievementsGroup);
+        CanvasGroupChanger(false, inventoryScreen);
+        CanvasGroupChanger(false, catGroup);
 
         //Load the data
         SaveSystem.LoadPlayer(ref data);
+
+        //Create the array of cats and add to it if previous data was saved
+        catList = new List<GameObject>();
+        if (data.cats < 20 && data.cats != 0)
+        {
+            for (int i = 0; i < data.cats; i++)
+            {
+                float spawnPositionX = UnityEngine.Random.Range(550f, 750f);
+                float spawnPositionY = UnityEngine.Random.Range(35f, 290f);
+
+                GameObject kitty = Instantiate(catPrefab, new Vector2(spawnPositionX, spawnPositionY), Quaternion.identity);
+                kitty.transform.SetParent(GameObject.FindGameObjectWithTag("CatGroup").transform);
+                kitty.transform.localScale = new Vector3(2, 2, 2);
+
+                catList.Add(kitty);
+            }
+        }
+        else if (data.cats >= 20)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                float spawnPositionX = UnityEngine.Random.Range(550f, 750f);
+                float spawnPositionY = UnityEngine.Random.Range(35f, 290f);
+
+                GameObject kitty = Instantiate(catPrefab, new Vector2(spawnPositionX, spawnPositionY), Quaternion.identity);
+                kitty.transform.SetParent(GameObject.FindGameObjectWithTag("CatGroup").transform);
+                kitty.transform.localScale = new Vector3(2, 2, 2);
+
+                catList.Add(kitty);
+            }
+        }
     }
 
     //Turn on and off the CanvasGroup
@@ -159,6 +204,8 @@ public class IdelGame : MonoBehaviour
         gemBoostText.text = data.gemboost.ToString("F2") + "x boost";
 
         data.coinsPerSecond = (data.productionUpgrade1Level + (data.productionUpgrade2Power * data.productionUpgrade2Level)) * data.gemboost;
+        //coinsPerSecond influenced by the number of cats in their beds
+        data.coinsPerSecond += (data.catBeds * 5);
 
         //coinsClickValue text
         clickValueText.text = "Click\n+" + NotationMethod(data.coinsClickValue, y: "F0") + "Coins";
@@ -168,6 +215,12 @@ public class IdelGame : MonoBehaviour
 
         //coins per second text
         coinsPerSecText.text = data.coinsPerSecond.ToString("F0") + " coins/s";
+
+        //cat number text
+        catNumberText.text = "Cats In This Cafe: " + data.cats;
+
+        //cat bed number text
+        catBedNumberText.text = "Beds For Your Cats: " + data.catBeds;
 
         //clickUpgrade1CostString
         string clickUpgrade1CostString;
@@ -374,6 +427,46 @@ public class IdelGame : MonoBehaviour
         data.coinsCollected += data.coinsClickValue;
     }
 
+    public void BuyCatUpgrade1()
+    {
+        var cu1cost = 50;
+        if (data.coins >= cu1cost)
+        {
+            data.coins -= cu1cost;
+            data.cats++;
+
+            //Cap the amount of spawned cats to 20
+            if (catList.Count < 20)
+            {
+                //Create a random Y position for the cat to spawn at
+                float spawnPositionY = UnityEngine.Random.Range(35f, 290f);
+
+                //Spawn the object, assign its parent to the canvas group, and reset its scale
+                GameObject kitty = Instantiate(catPrefab, new Vector2(600, spawnPositionY), Quaternion.identity);
+                kitty.transform.SetParent(GameObject.FindGameObjectWithTag("CatGroup").transform);
+                kitty.transform.localScale = new Vector3(2, 2, 2);
+
+                //Add the kitty to the list of cats
+                catList.Add(kitty);
+            }
+
+            //Temporary solution for buying cats. Will change later after design discussion
+            data.coinsClickValue++;
+        }
+    }
+
+    public void BuyCatBedUpgrade1()
+    {
+        var cbu1cost = 100;
+        if (data.coins >= cbu1cost && data.catBeds < data.cats) //Only lets you buy beds if you have cats
+        {
+            data.coins -= cbu1cost;
+            data.catBeds++;
+
+            //Cat bed multiplier is already called under Update(). This method just increments catBeds
+        }
+    }
+
     //ClickUpgrade1
     public void BuyClickUpgrade1()
     {
@@ -564,6 +657,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, achievementsGroup);
+                CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -574,6 +669,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, achievementsGroup);
+                CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -584,6 +681,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, achievementsGroup);
+                CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = false;
                 settingimage.enabled = true;
                 break;
@@ -594,6 +693,8 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, achievementsGroup);
+                CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -605,6 +706,20 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(true, header);
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(true, achievementsGroup);
+                CanvasGroupChanger(false, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
+                backgroundimage.enabled = true;
+                settingimage.enabled = false;
+                break;
+            case "Inventory":
+                CanvasGroupChanger(false, mainMenuGroup);
+                CanvasGroupChanger(false, upgradesGroup);
+                CanvasGroupChanger(false, settingScreen);
+                CanvasGroupChanger(true, header);
+                CanvasGroupChanger(false, startScreen);
+                CanvasGroupChanger(false, achievementsGroup);
+                CanvasGroupChanger(true, inventoryScreen);
+                CanvasGroupChanger(true, catGroup);
                 backgroundimage.enabled = true;
                 settingimage.enabled = false;
                 break;
@@ -624,6 +739,13 @@ public class IdelGame : MonoBehaviour
     public void FullReset()
     {
         data.FullReset();
+
+        //Clear the list of cats
+        for (int i = 0; i < catList.Count; i++)
+        {
+            Destroy(catList[i].gameObject);
+        }
+        catList.Clear();
     }
 
     public void ExitGame()
