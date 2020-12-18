@@ -4553,6 +4553,8 @@ MonoBehaviour:
   clickUpgrade2Bar: {fileID: 299546183}
   productionUpgrade1Bar: {fileID: 1017136775}
   productionUpgrade2Bar: {fileID: 1020127234}
+  currentAchevement: {fileID: 257966230}
+  clickAchevement: {fileID: 594289189}
   clickUpgrade1MaxText: {fileID: 2090931756}
   clickUpgrade2MaxText: {fileID: 1068275861}
   productionUpgrade1MaxText: {fileID: 279306324}
@@ -6531,7 +6533,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1384854235}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -7392,7 +7394,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Achievement Name 1
+  m_Text: Achievement Name 2
 --- !u!222 &1505324908
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10033,6 +10035,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: AchievementScreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 7571526628309966819, guid: e117a46f66517c84e9afd40b8cf25521,
+        type: 3}
+      propertyPath: m_Text
+      value: Achievement Name 2
       objectReference: {fileID: 0}
     - target: {fileID: 7571526628731164593, guid: e117a46f66517c84e9afd40b8cf25521,
         type: 3}

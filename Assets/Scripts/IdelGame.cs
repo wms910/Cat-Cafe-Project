@@ -333,8 +333,8 @@ public class IdelGame : MonoBehaviour
         SaveSystem.SavePlayer(data);
     }
 
-    private static string[] AchievementStrings => new string[] {"Current Coins", "Total Coins Collected"};
-    private BigDouble[] AchievementsNumber => new BigDouble[] { data.coins, data.coinsCollected };
+    private static string[] AchievementStrings => new string[] {"Current Coins", "Click Coins Collected"};
+    private BigDouble[] AchievementsNumber => new BigDouble[] { data.coins, data.coinsCollected};
     private void RunAchievements()
     {
         UpdateAchievement(AchievementStrings[0],number: AchievementsNumber[0], ref data.achlevel1, ref achievementList[0].fill, ref achievementList[0].title, ref achievementList[0].progress);
@@ -343,17 +343,17 @@ public class IdelGame : MonoBehaviour
 
     private void UpdateAchievement(string name, BigDouble number,ref BigDouble level, ref Image fill, ref Text title, ref Text progress)
     {
-        var cap = BigDouble.Pow(value: 10, power: level);
+        var cap = BigDouble.Pow(10, level);
 
         title.text = $"{name}\n({level})";
-        progress.text = $"{NotationMethod(number, y: "F2")}/{NotationMethod(cap, y: "F2")}";
+        progress.text = $"{NotationMethod(number, "F2")}/{NotationMethod(cap, "F2")}";
 
-        BigDoubleFill(x: number, y: cap, fill);
+        BigDoubleFill(number, cap, fill);
 
         if (number < cap) return;
         BigDouble levels = 0;
-        if (One / cap >= 1)
-            levels = Floor(Log10(One / cap)) + 1;
+        if (number / cap >= 1)
+            levels = Floor(Log10(number / cap)) + 1;
         level += levels;
     }
 
@@ -407,6 +407,8 @@ public class IdelGame : MonoBehaviour
         if(data.coins > 1000)
         {
             data.coins = 0;
+            data.coinsCollected = 0;
+            data.coinsPerSecond = 0;
             data.coinsClickValue = 1;
             data.productionUpgrade2Power = 5;
 
@@ -414,7 +416,10 @@ public class IdelGame : MonoBehaviour
             data.clickUpgrade2Level = 0;
             data.productionUpgrade1Level = 0;
             data.productionUpgrade2Level = 0;
-
+            data.achlevel1 = 0;
+            data.achlevel2 = 0;
+            data.cats = 0;
+            data.catBeds = 0;
             data.gems += data.gemsToGet;
         }
     }
