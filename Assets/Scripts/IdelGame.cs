@@ -46,7 +46,7 @@ public class PlayerData
         clickUpgrade2Level = 0;
         productionUpgrade1Level = 0;
         productionUpgrade2Level = 0;
-        productionUpgrade2Power = 0;
+        productionUpgrade2Power = 5;
         gems = 0;
         gemboost = 1;
         gemsToGet = 0;
@@ -420,6 +420,7 @@ public class IdelGame : MonoBehaviour
             data.achlevel2 = 0;
             data.cats = 0;
             data.catBeds = 0;
+            data.gemboost = 1;
             data.gems += data.gemsToGet;
         }
     }
@@ -428,8 +429,8 @@ public class IdelGame : MonoBehaviour
     //Buttons
     public void Click()
     {
-        data.coins += data.coinsClickValue;
-        data.coinsCollected += data.coinsClickValue;
+        data.coins += (data.coinsClickValue * data.gemboost);
+        data.coinsCollected += (data.coinsClickValue * data.gemboost);
     }
 
     public void BuyCatUpgrade1()
@@ -687,7 +688,7 @@ public class IdelGame : MonoBehaviour
                 CanvasGroupChanger(false, startScreen);
                 CanvasGroupChanger(false, achievementsGroup);
                 CanvasGroupChanger(false, inventoryScreen);
-                CanvasGroupChanger(true, catGroup);
+                CanvasGroupChanger(false, catGroup);
                 backgroundimage.enabled = false;
                 settingimage.enabled = true;
                 break;

@@ -4553,8 +4553,6 @@ MonoBehaviour:
   clickUpgrade2Bar: {fileID: 299546183}
   productionUpgrade1Bar: {fileID: 1017136775}
   productionUpgrade2Bar: {fileID: 1020127234}
-  currentAchevement: {fileID: 257966230}
-  clickAchevement: {fileID: 594289189}
   clickUpgrade1MaxText: {fileID: 2090931756}
   clickUpgrade2MaxText: {fileID: 1068275861}
   productionUpgrade1MaxText: {fileID: 279306324}
